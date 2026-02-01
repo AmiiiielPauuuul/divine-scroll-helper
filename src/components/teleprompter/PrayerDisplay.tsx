@@ -69,7 +69,15 @@ export function PrayerDisplay({ className }: PrayerDisplayProps) {
                   'text-teleprompter-text leading-relaxed'
                 )}
               >
-                <span className="text-teleprompter-active">•</span>
+                <span className={cn(
+                  'flex-shrink-0',
+                  fontSize === 'sm' ? 'text-lg' :
+                  fontSize === 'md' ? 'text-xl' :
+                  fontSize === 'lg' ? 'text-2xl' :
+                  fontSize === 'xl' ? 'text-3xl' : 'text-4xl'
+                )}>
+                  {group.icon}
+                </span>
                 <span>{prayer.content}</span>
               </div>
             ))}
