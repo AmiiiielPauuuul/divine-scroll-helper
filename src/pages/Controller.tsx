@@ -1,6 +1,7 @@
 import { TeleprompterProvider, useTeleprompter } from '@/contexts/TeleprompterContext';
 import {
   TabSelector,
+  DisplayTabSelector,
   ScrollControls,
   FontSizeControl,
   ContentEditor,
@@ -11,8 +12,9 @@ import { Monitor, Tablet, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 function ControllerContent() {
-  const { activeTab, tabs } = useTeleprompter();
+  const { activeTab, displayTab, tabs } = useTeleprompter();
   const currentTab = tabs.find(t => t.id === activeTab);
+  const displayTabData = tabs.find(t => t.id === displayTab);
 
   return (
     <div className="min-h-screen bg-background flex flex-col dark">
@@ -53,8 +55,9 @@ function ControllerContent() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-12rem)]">
           {/* Left Panel - Editor */}
           <div className="flex flex-col bg-card rounded-xl border border-border overflow-hidden">
-            {/* Tab Selector */}
+            {/* Tab Selector for Editing */}
             <div className="p-4 border-b border-border bg-card/50">
+              <p className="text-xs text-muted-foreground mb-2">Edit content for:</p>
               <TabSelector />
             </div>
 
@@ -78,11 +81,21 @@ function ControllerContent() {
             </div>
           </div>
 
-          {/* Right Panel - Preview */}
+          {/* Right Panel - Preview & Display Control */}
           <div className="flex flex-col bg-card rounded-xl border border-border overflow-hidden">
+            {/* Display Tab Selector */}
+            <div className="p-4 border-b border-border bg-card/50">
+              <DisplayTabSelector />
+            </div>
+
             {/* Preview Header */}
-            <div className="p-4 border-b border-border bg-card/50 flex items-center justify-between">
-              <h2 className="text-lg font-medium text-foreground">Live Preview</h2>
+            <div className="p-3 border-b border-border bg-muted/30 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">{displayTabData?.icon}</span>
+                <h2 className="text-sm font-medium text-foreground">
+                  Showing: {displayTabData?.label}
+                </h2>
+              </div>
               <div className="flex items-center gap-3">
                 <ScrollControls />
               </div>

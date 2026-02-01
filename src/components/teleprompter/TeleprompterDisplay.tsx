@@ -16,11 +16,11 @@ interface TeleprompterDisplayProps {
 }
 
 export function TeleprompterDisplay({ className, showTabIndicator = true }: TeleprompterDisplayProps) {
-  const { tabs, activeTab, fontSize, scrollSpeed, isAutoScrolling } = useTeleprompter();
+  const { tabs, displayTab, fontSize, scrollSpeed, isAutoScrolling } = useTeleprompter();
   const scrollRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number | null>(null);
 
-  const currentTab = tabs.find(t => t.id === activeTab);
+  const currentTab = tabs.find(t => t.id === displayTab);
   const displayContent = currentTab?.content || currentTab?.placeholder || '';
 
   // Auto-scroll logic
@@ -56,12 +56,12 @@ export function TeleprompterDisplay({ className, showTabIndicator = true }: Tele
     };
   }, [isAutoScrolling, scrollSpeed, scroll]);
 
-  // Reset scroll position when tab changes
+  // Reset scroll position when display tab changes
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = 0;
     }
-  }, [activeTab]);
+  }, [displayTab]);
 
   return (
     <div

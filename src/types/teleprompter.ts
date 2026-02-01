@@ -11,7 +11,8 @@ export interface Tab {
 }
 
 export interface TeleprompterState {
-  activeTab: TabId;
+  activeTab: TabId;      // Tab being edited on controller
+  displayTab: TabId;     // Tab shown on pastor's display
   tabs: Tab[];
   scrollSpeed: number; // 0-100, 0 = paused
   isAutoScrolling: boolean;
@@ -20,6 +21,7 @@ export interface TeleprompterState {
 
 export interface TeleprompterContextValue extends TeleprompterState {
   setActiveTab: (tabId: TabId) => void;
+  setDisplayTab: (tabId: TabId) => void;
   updateTabContent: (tabId: TabId, content: string) => void;
   setScrollSpeed: (speed: number) => void;
   toggleAutoScroll: () => void;
