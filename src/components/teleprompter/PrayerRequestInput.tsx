@@ -433,6 +433,7 @@ function PrayerTile({
         'cursor-grab active:cursor-grabbing',
         'transition-all duration-200',
         'group hover:bg-secondary/80',
+        prayer.completed && 'opacity-60',
         isDragging && 'opacity-50 scale-95',
         isDragOver && 'border-primary bg-primary/10 scale-[1.02]'
       )}
@@ -442,9 +443,29 @@ function PrayerTile({
         <GripVertical size={16} />
       </div>
 
+      {/* Done Checkbox */}
+      <input
+        type="checkbox"
+        checked={!!prayer.completed}
+        onChange={(e) => onUpdatePrayer(prayer.id, { completed: e.target.checked })}
+        onClick={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
+        draggable={false}
+        className={cn(
+          'h-4 w-4 rounded border-border',
+          'text-primary focus:ring-2 focus:ring-primary/50'
+        )}
+        aria-label={`Mark ${prayer.content} as prayed`}
+      />
+
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <span className="text-sm font-semibold text-foreground">{prayer.content}</span>
+        <span className={cn(
+          'text-sm font-semibold text-foreground',
+          prayer.completed && 'line-through text-muted-foreground'
+        )}>
+          {prayer.content}
+        </span>
         {isEditingPrayer ? (
           <div className="mt-1 flex gap-1">
             <input
@@ -475,59 +496,12 @@ function PrayerTile({
             onClick={() => setIsEditingPrayer(true)}
             className={cn(
               'text-xs mt-0.5 cursor-pointer hover:text-primary transition-colors',
-              prayer.specificPrayer ? 'text-muted-foreground italic' : 'text-muted-foreground/50'
+              prayer.specificPrayer ? 'text-muted-foreground italic' : 'text-muted-foreground/50',
+              prayer.completed && 'line-through text-muted-foreground/70'
             )}
           >
             {prayer.specificPrayer || 'Click to add specific prayer...'}
           </div>
-        )}
-      </div>
-
-      {/* Type Selector */}
-      <div className="relative">
-        <button
-          onClick={() => setShowTypeMenu(!showTypeMenu)}
-          className={cn(
-            'flex items-center gap-1 px-2 py-1 rounded text-xs',
-            'bg-background/50 hover:bg-background transition-colors',
-            currentType?.color
-          )}
-        >
-          <span>{currentType?.icon || '🙏'}</span>
-          <ChevronDown size={12} />
-        </button>
-
-        {showTypeMenu && (
-          <>
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => setShowTypeMenu(false)}
-            />
-            <div className={cn(
-              'absolute right-0 top-full mt-1 z-50',
-              'bg-popover border border-border rounded-lg shadow-lg',
-              'min-w-[140px] py-1',
-              'animate-fade-in'
-            )}>
-              {prayerTypes.map(type => (
-                <button
-                  key={type.id}
-                  onClick={() => {
-                    onTypeChange(prayer.id, type.id);
-                    setShowTypeMenu(false);
-                  }}
-                  className={cn(
-                    'w-full flex items-center gap-2 px-3 py-1.5 text-left text-sm',
-                    'hover:bg-accent transition-colors',
-                    prayer.type === type.id && 'bg-accent/50'
-                  )}
-                >
-                  <span>{type.icon}</span>
-                  <span>{type.label}</span>
-                </button>
-              ))}
-            </div>
-          </>
         )}
       </div>
 

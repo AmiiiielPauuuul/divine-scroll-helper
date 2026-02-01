@@ -65,7 +65,8 @@ export function PrayerDisplay({ className }: PrayerDisplayProps) {
                 key={prayer.id}
                 className={cn(
                   'flex items-start gap-3',
-                  'text-teleprompter-text leading-relaxed'
+                  'text-teleprompter-text leading-relaxed',
+                  prayer.completed && 'opacity-50'
                 )}
               >
                 <span className={cn(
@@ -80,7 +81,8 @@ export function PrayerDisplay({ className }: PrayerDisplayProps) {
                 <div className="flex flex-col">
                   <span className={cn(
                     'font-bold',
-                    FONT_SIZE_CLASSES[fontSize]
+                    FONT_SIZE_CLASSES[fontSize],
+                    prayer.completed && 'line-through text-teleprompter-text/70'
                   )}>
                     {prayer.content}
                   </span>
@@ -90,7 +92,8 @@ export function PrayerDisplay({ className }: PrayerDisplayProps) {
                       fontSize === 'sm' ? 'text-base' :
                       fontSize === 'md' ? 'text-lg' :
                       fontSize === 'lg' ? 'text-xl' :
-                      fontSize === 'xl' ? 'text-2xl' : 'text-3xl'
+                      fontSize === 'xl' ? 'text-2xl' : 'text-3xl',
+                      prayer.completed && 'line-through text-teleprompter-text/60'
                     )}>
                       {prayer.specificPrayer}
                     </span>

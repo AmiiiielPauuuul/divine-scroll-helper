@@ -26,6 +26,7 @@ export interface PrayerRequest {
   type: PrayerType;
   content: string;
   specificPrayer?: string; // Optional specific prayer text (scripture, intent, etc.)
+  completed?: boolean;
   createdAt: number;
 }
 

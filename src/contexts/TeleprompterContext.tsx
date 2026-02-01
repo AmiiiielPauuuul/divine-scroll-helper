@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from 'react';
 import {
   TabId,
   Tab,
@@ -16,12 +16,17 @@ const TeleprompterContext = createContext<TeleprompterContextValue | null>(null)
 
 // Broadcast channel for cross-tab communication
 const CHANNEL_NAME = 'church-teleprompter-sync';
+// Optional WebSocket sync for cross-device communication
+const WS_ENV_KEY = 'VITE_SYNC_SERVER_URL';
 
 interface TeleprompterProviderProps {
   children: ReactNode;
 }
 
 export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
+  const clientIdRef = useRef(`client-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+  const wsRef = useRef<WebSocket | null>(null);
+  const skipWsBroadcastRef = useRef(false);
   const [state, setState] = useState<TeleprompterState>(() => {
     // Load initial state from localStorage
     if (typeof window !== 'undefined') {
@@ -64,10 +69,70 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
     return null;
   });
 
+  const wsUrlFromEnv = typeof import.meta !== 'undefined'
+    ? (import.meta as { env?: Record<string, string> }).env?.[WS_ENV_KEY]
+    : undefined;
+  const wsUrl = wsUrlFromEnv || (
+    typeof window !== 'undefined'
+      ? `ws://${window.location.hostname}:5174`
+      : undefined
+  );
+
+  // WebSocket connection for cross-device sync (optional)
+  useEffect(() => {
+    if (!wsUrl) return;
+
+    const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
+
+    const handleMessage = (event: MessageEvent) => {
+      try {
+        const payload = JSON.parse(event.data as string);
+        if (payload?.type !== 'STATE_UPDATE') return;
+        if (payload?.origin === clientIdRef.current) return;
+
+        skipWsBroadcastRef.current = true;
+        setState(prev => {
+          const incoming = payload.state as TeleprompterState;
+          if (!incoming) return prev;
+          if (JSON.stringify(prev) === JSON.stringify(incoming)) return prev;
+          return incoming;
+        });
+      } catch (e) {
+        console.error('Failed to parse WebSocket message:', e);
+      }
+    };
+
+    ws.addEventListener('message', handleMessage);
+
+    return () => {
+      ws.removeEventListener('message', handleMessage);
+      ws.close();
+      if (wsRef.current === ws) {
+        wsRef.current = null;
+      }
+    };
+  }, [wsUrl]);
+
   // Save state to localStorage and broadcast changes
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     channel?.postMessage({ type: 'STATE_UPDATE', state });
+
+    const ws = wsRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      if (skipWsBroadcastRef.current) {
+        skipWsBroadcastRef.current = false;
+      } else {
+        ws.send(JSON.stringify({
+          type: 'STATE_UPDATE',
+          origin: clientIdRef.current,
+          state,
+        }));
+      }
+    } else if (skipWsBroadcastRef.current) {
+      skipWsBroadcastRef.current = false;
+    }
   }, [state, channel]);
 
   // Listen for updates from other tabs
@@ -132,6 +197,7 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
       type,
       content,
       specificPrayer,
+      completed: false,
       createdAt: Date.now(),
     };
     setState(prev => ({
