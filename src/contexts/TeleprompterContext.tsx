@@ -142,6 +142,30 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
     }));
   }, []);
 
+  const reorderPrayerRequest = useCallback((draggedId: string, targetId: string) => {
+    setState(prev => {
+      const prayers = [...prev.prayerRequests];
+      const draggedIndex = prayers.findIndex(p => p.id === draggedId);
+      const targetIndex = prayers.findIndex(p => p.id === targetId);
+      
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+      
+      const [dragged] = prayers.splice(draggedIndex, 1);
+      prayers.splice(targetIndex, 0, dragged);
+      
+      return { ...prev, prayerRequests: prayers };
+    });
+  }, []);
+
+  const updatePrayerType = useCallback((id: string, type: PrayerType) => {
+    setState(prev => ({
+      ...prev,
+      prayerRequests: prev.prayerRequests.map(p =>
+        p.id === id ? { ...p, type } : p
+      ),
+    }));
+  }, []);
+
   const setScrollSpeed = useCallback((speed: number) => {
     setState(prev => ({ ...prev, scrollSpeed: Math.max(0, Math.min(100, speed)) }));
   }, []);
@@ -161,6 +185,8 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
     updateTabContent,
     addPrayerRequest,
     removePrayerRequest,
+    reorderPrayerRequest,
+    updatePrayerType,
     setScrollSpeed,
     toggleAutoScroll,
     setFontSize,
