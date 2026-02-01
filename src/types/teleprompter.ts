@@ -52,6 +52,8 @@ export interface TeleprompterContextValue extends TeleprompterState {
   updateTabContent: (tabId: TabId, content: string) => void;
   addPrayerRequest: (type: PrayerType, content: string) => void;
   removePrayerRequest: (id: string) => void;
+  reorderPrayerRequest: (draggedId: string, targetId: string) => void;
+  updatePrayerType: (id: string, type: PrayerType) => void;
   setScrollSpeed: (speed: number) => void;
   toggleAutoScroll: () => void;
   setFontSize: (size: TeleprompterState['fontSize']) => void;
