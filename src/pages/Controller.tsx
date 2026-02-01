@@ -6,6 +6,7 @@ import {
   FontSizeControl,
   ContentEditor,
   TeleprompterDisplay,
+  PrayerRequestInput,
 } from '@/components/teleprompter';
 import { cn } from '@/lib/utils';
 import { Monitor, Tablet, RefreshCw } from 'lucide-react';
@@ -61,9 +62,13 @@ function ControllerContent() {
               <TabSelector />
             </div>
 
-            {/* Content Editor */}
+            {/* Content Editor - Show PrayerRequestInput for prayers tab */}
             <div className="flex-1 p-4 overflow-hidden">
-              <ContentEditor className="h-full" />
+              {activeTab === 'prayers' ? (
+                <PrayerRequestInput />
+              ) : (
+                <ContentEditor className="h-full" />
+              )}
             </div>
 
             {/* Editor Footer */}

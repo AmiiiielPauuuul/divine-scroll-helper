@@ -1,6 +1,7 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { useTeleprompter } from '@/contexts/TeleprompterContext';
 import { cn } from '@/lib/utils';
+import { PrayerDisplay } from './PrayerDisplay';
 
 const FONT_SIZE_CLASSES = {
   sm: 'text-teleprompter-sm',
@@ -91,16 +92,23 @@ export function TeleprompterDisplay({ className, showTabIndicator = true }: Tele
         )}
         style={{ scrollBehavior: isAutoScrolling ? 'auto' : 'smooth' }}
       >
-        <div
-          className={cn(
-            'max-w-4xl mx-auto teleprompter-text',
-            FONT_SIZE_CLASSES[fontSize],
-            'text-teleprompter-text leading-relaxed whitespace-pre-wrap',
-            'animate-slide-up'
-          )}
-        >
-          {displayContent}
-        </div>
+        {/* Show PrayerDisplay for prayers tab, regular content for others */}
+        {displayTab === 'prayers' ? (
+          <div className="max-w-4xl mx-auto animate-slide-up">
+            <PrayerDisplay />
+          </div>
+        ) : (
+          <div
+            className={cn(
+              'max-w-4xl mx-auto teleprompter-text',
+              FONT_SIZE_CLASSES[fontSize],
+              'text-teleprompter-text leading-relaxed whitespace-pre-wrap',
+              'animate-slide-up'
+            )}
+          >
+            {displayContent}
+          </div>
+        )}
         
         {/* Extra padding at bottom for scroll */}
         <div className="h-[50vh]" aria-hidden="true" />

@@ -2,6 +2,32 @@
 
 export type TabId = 'prayers' | 'birthdays' | 'weddings' | 'announcements';
 
+// Prayer request types/categories
+export type PrayerType = 'healing' | 'spiritual' | 'family' | 'financial' | 'thanksgiving' | 'other';
+
+export interface PrayerTypeInfo {
+  id: PrayerType;
+  label: string;
+  icon: string;
+  color: string; // Tailwind color class
+}
+
+export const PRAYER_TYPES: PrayerTypeInfo[] = [
+  { id: 'healing', label: 'Healing', icon: '💚', color: 'text-green-400' },
+  { id: 'spiritual', label: 'Spiritual Growth', icon: '✨', color: 'text-purple-400' },
+  { id: 'family', label: 'Family', icon: '👨‍👩‍👧‍👦', color: 'text-blue-400' },
+  { id: 'financial', label: 'Financial', icon: '💰', color: 'text-yellow-400' },
+  { id: 'thanksgiving', label: 'Thanksgiving', icon: '🙌', color: 'text-orange-400' },
+  { id: 'other', label: 'Other', icon: '🙏', color: 'text-muted-foreground' },
+];
+
+export interface PrayerRequest {
+  id: string;
+  type: PrayerType;
+  content: string;
+  createdAt: number;
+}
+
 export interface Tab {
   id: TabId;
   label: string;
@@ -14,6 +40,7 @@ export interface TeleprompterState {
   activeTab: TabId;      // Tab being edited on controller
   displayTab: TabId;     // Tab shown on pastor's display
   tabs: Tab[];
+  prayerRequests: PrayerRequest[];  // Typed prayer requests
   scrollSpeed: number; // 0-100, 0 = paused
   isAutoScrolling: boolean;
   fontSize: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
@@ -23,6 +50,8 @@ export interface TeleprompterContextValue extends TeleprompterState {
   setActiveTab: (tabId: TabId) => void;
   setDisplayTab: (tabId: TabId) => void;
   updateTabContent: (tabId: TabId, content: string) => void;
+  addPrayerRequest: (type: PrayerType, content: string) => void;
+  removePrayerRequest: (id: string) => void;
   setScrollSpeed: (speed: number) => void;
   toggleAutoScroll: () => void;
   setFontSize: (size: TeleprompterState['fontSize']) => void;

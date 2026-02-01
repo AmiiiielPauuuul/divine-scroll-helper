@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect, useCallback, Rea
 import {
   TabId,
   Tab,
+  PrayerType,
+  PrayerRequest,
   TeleprompterState,
   TeleprompterContextValue,
   DEFAULT_TABS,
@@ -29,6 +31,7 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
             activeTab: parsed.activeTab || 'prayers',
             displayTab: parsed.displayTab || 'prayers',
             tabs: parsed.tabs || DEFAULT_TABS,
+            prayerRequests: parsed.prayerRequests || [],
             scrollSpeed: parsed.scrollSpeed ?? 30,
             isAutoScrolling: parsed.isAutoScrolling ?? false,
             fontSize: parsed.fontSize || 'lg',
@@ -42,6 +45,7 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
       activeTab: 'prayers',
       displayTab: 'prayers',
       tabs: DEFAULT_TABS,
+      prayerRequests: [],
       scrollSpeed: 30,
       isAutoScrolling: false,
       fontSize: 'lg',
@@ -118,6 +122,26 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
     }));
   }, []);
 
+  const addPrayerRequest = useCallback((type: PrayerType, content: string) => {
+    const newRequest: PrayerRequest = {
+      id: `prayer-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      type,
+      content,
+      createdAt: Date.now(),
+    };
+    setState(prev => ({
+      ...prev,
+      prayerRequests: [...prev.prayerRequests, newRequest],
+    }));
+  }, []);
+
+  const removePrayerRequest = useCallback((id: string) => {
+    setState(prev => ({
+      ...prev,
+      prayerRequests: prev.prayerRequests.filter(p => p.id !== id),
+    }));
+  }, []);
+
   const setScrollSpeed = useCallback((speed: number) => {
     setState(prev => ({ ...prev, scrollSpeed: Math.max(0, Math.min(100, speed)) }));
   }, []);
@@ -135,6 +159,8 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
     setActiveTab,
     setDisplayTab,
     updateTabContent,
+    addPrayerRequest,
+    removePrayerRequest,
     setScrollSpeed,
     toggleAutoScroll,
     setFontSize,
