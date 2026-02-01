@@ -3,10 +3,12 @@ import {
   TabId,
   Tab,
   PrayerType,
+  PrayerTypeInfo,
   PrayerRequest,
   TeleprompterState,
   TeleprompterContextValue,
   DEFAULT_TABS,
+  DEFAULT_PRAYER_TYPES,
   STORAGE_KEY,
 } from '@/types/teleprompter';
 
@@ -31,6 +33,7 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
             activeTab: parsed.activeTab || 'prayers',
             displayTab: parsed.displayTab || 'prayers',
             tabs: parsed.tabs || DEFAULT_TABS,
+            prayerTypes: parsed.prayerTypes || DEFAULT_PRAYER_TYPES,
             prayerRequests: parsed.prayerRequests || [],
             scrollSpeed: parsed.scrollSpeed ?? 30,
             isAutoScrolling: parsed.isAutoScrolling ?? false,
@@ -45,6 +48,7 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
       activeTab: 'prayers',
       displayTab: 'prayers',
       tabs: DEFAULT_TABS,
+      prayerTypes: DEFAULT_PRAYER_TYPES,
       prayerRequests: [],
       scrollSpeed: 30,
       isAutoScrolling: false,
@@ -178,11 +182,45 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
     setState(prev => ({ ...prev, fontSize }));
   }, []);
 
+  // Prayer Type Management
+  const addPrayerType = useCallback((type: Omit<PrayerTypeInfo, 'id'>) => {
+    const id = `type-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    setState(prev => ({
+      ...prev,
+      prayerTypes: [...prev.prayerTypes, { ...type, id }],
+    }));
+  }, []);
+
+  const updatePrayerTypeInfo = useCallback((id: string, updates: Partial<Omit<PrayerTypeInfo, 'id'>>) => {
+    setState(prev => ({
+      ...prev,
+      prayerTypes: prev.prayerTypes.map(t =>
+        t.id === id ? { ...t, ...updates } : t
+      ),
+    }));
+  }, []);
+
+  const removePrayerType = useCallback((id: string) => {
+    setState(prev => ({
+      ...prev,
+      prayerTypes: prev.prayerTypes.filter(t => t.id !== id),
+      // Move prayers of deleted type to 'other' or first available type
+      prayerRequests: prev.prayerRequests.map(p =>
+        p.type === id
+          ? { ...p, type: prev.prayerTypes.find(t => t.id !== id)?.id || 'other' }
+          : p
+      ),
+    }));
+  }, []);
+
   const value: TeleprompterContextValue = {
     ...state,
     setActiveTab,
     setDisplayTab,
     updateTabContent,
+    addPrayerType,
+    updatePrayerTypeInfo,
+    removePrayerType,
     addPrayerRequest,
     removePrayerRequest,
     reorderPrayerRequest,
