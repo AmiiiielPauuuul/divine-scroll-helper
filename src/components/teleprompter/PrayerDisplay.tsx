@@ -1,5 +1,4 @@
 import { useTeleprompter } from '@/contexts/TeleprompterContext';
-import { PRAYER_TYPES } from '@/types/teleprompter';
 import { cn } from '@/lib/utils';
 
 const FONT_SIZE_CLASSES = {
@@ -15,10 +14,10 @@ interface PrayerDisplayProps {
 }
 
 export function PrayerDisplay({ className }: PrayerDisplayProps) {
-  const { prayerRequests, fontSize } = useTeleprompter();
+  const { prayerRequests, prayerTypes, fontSize } = useTeleprompter();
 
-  // Group prayers by type
-  const groupedPrayers = PRAYER_TYPES.map(type => ({
+  // Group prayers by type using dynamic prayerTypes
+  const groupedPrayers = prayerTypes.map(type => ({
     ...type,
     prayers: prayerRequests.filter(p => p.type === type.id),
   })).filter(group => group.prayers.length > 0);

@@ -1,26 +1,69 @@
 import { useState } from 'react';
 import { useTeleprompter } from '@/contexts/TeleprompterContext';
-import { PRAYER_TYPES, PrayerType, PrayerRequest } from '@/types/teleprompter';
+import { PrayerType, PrayerRequest, PrayerTypeInfo } from '@/types/teleprompter';
 import { cn } from '@/lib/utils';
-import { Plus, X, GripVertical, ChevronDown } from 'lucide-react';
+import { Plus, X, GripVertical, ChevronDown, Settings, Trash2 } from 'lucide-react';
+
+// Available colors for prayer types
+const TYPE_COLORS = [
+  { label: 'Green', value: 'text-green-400' },
+  { label: 'Purple', value: 'text-purple-400' },
+  { label: 'Blue', value: 'text-blue-400' },
+  { label: 'Yellow', value: 'text-yellow-400' },
+  { label: 'Orange', value: 'text-orange-400' },
+  { label: 'Red', value: 'text-red-400' },
+  { label: 'Pink', value: 'text-pink-400' },
+  { label: 'Teal', value: 'text-teal-400' },
+];
+
+// Common emoji options for quick selection
+const COMMON_EMOJIS = ['🙏', '💚', '✨', '👨‍👩‍👧‍👦', '💰', '🙌', '❤️', '🎓', '💼', '🏠', '✝️', '📖'];
 
 export function PrayerRequestInput() {
-  const { addPrayerRequest, prayerRequests, removePrayerRequest, reorderPrayerRequest, updatePrayerType } = useTeleprompter();
+  const {
+    addPrayerRequest,
+    prayerRequests,
+    prayerTypes,
+    removePrayerRequest,
+    reorderPrayerRequest,
+    updatePrayerType,
+    addPrayerType,
+    updatePrayerTypeInfo,
+    removePrayerType,
+  } = useTeleprompter();
+
   const [content, setContent] = useState('');
-  const [selectedType, setSelectedType] = useState<PrayerType>('healing');
+  const [selectedType, setSelectedType] = useState<PrayerType>(prayerTypes[0]?.id || '');
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [showTypeManager, setShowTypeManager] = useState(false);
+  const [newTypeName, setNewTypeName] = useState('');
+  const [newTypeIcon, setNewTypeIcon] = useState('🙏');
+  const [newTypeColor, setNewTypeColor] = useState('text-blue-400');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (content.trim()) {
+    if (content.trim() && selectedType) {
       addPrayerRequest(selectedType, content.trim());
       setContent('');
     }
   };
 
+  const handleAddType = () => {
+    if (newTypeName.trim()) {
+      addPrayerType({
+        label: newTypeName.trim(),
+        icon: newTypeIcon,
+        color: newTypeColor,
+      });
+      setNewTypeName('');
+      setNewTypeIcon('🙏');
+      setNewTypeColor('text-blue-400');
+    }
+  };
+
   // Group prayers by type
-  const groupedPrayers = PRAYER_TYPES.map(type => ({
+  const groupedPrayers = prayerTypes.map(type => ({
     ...type,
     prayers: prayerRequests.filter(p => p.type === type.id),
   })).filter(group => group.prayers.length > 0);
@@ -57,7 +100,6 @@ export function PrayerRequestInput() {
     setDragOverId(null);
   };
 
-  // Drop on category header to change type
   const handleDropOnCategory = (e: React.DragEvent, newType: PrayerType) => {
     e.preventDefault();
     if (draggedId) {
@@ -69,16 +111,117 @@ export function PrayerRequestInput() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Add Prayer Form */}
-      <form onSubmit={handleSubmit} className="mb-4">
-        <div className="flex items-center gap-2 mb-3">
+      {/* Header with Type Manager Toggle */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
           <span className="text-2xl">🙏</span>
           <h2 className="text-xl font-semibold text-foreground">Prayer Requests</h2>
         </div>
+        <button
+          onClick={() => setShowTypeManager(!showTypeManager)}
+          className={cn(
+            'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all',
+            showTypeManager
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+          )}
+        >
+          <Settings size={14} />
+          <span>Categories</span>
+        </button>
+      </div>
 
+      {/* Type Manager Panel */}
+      {showTypeManager && (
+        <div className="mb-4 p-4 rounded-lg bg-muted/50 border border-border animate-fade-in">
+          <h3 className="text-sm font-medium text-foreground mb-3">Manage Categories</h3>
+
+          {/* Add New Type */}
+          <div className="flex gap-2 mb-3">
+            <div className="relative">
+              <button
+                type="button"
+                className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-xl hover:bg-card/80"
+                onClick={() => {
+                  const currentIndex = COMMON_EMOJIS.indexOf(newTypeIcon);
+                  const nextIndex = (currentIndex + 1) % COMMON_EMOJIS.length;
+                  setNewTypeIcon(COMMON_EMOJIS[nextIndex]);
+                }}
+              >
+                {newTypeIcon}
+              </button>
+            </div>
+            <input
+              type="text"
+              value={newTypeName}
+              onChange={e => setNewTypeName(e.target.value)}
+              placeholder="Category name..."
+              className={cn(
+                'flex-1 px-3 py-2 rounded-lg text-sm',
+                'bg-card border border-border',
+                'placeholder:text-muted-foreground/60',
+                'focus:outline-none focus:ring-2 focus:ring-primary/50'
+              )}
+            />
+            <select
+              value={newTypeColor}
+              onChange={e => setNewTypeColor(e.target.value)}
+              className={cn(
+                'px-3 py-2 rounded-lg text-sm',
+                'bg-card border border-border',
+                'focus:outline-none focus:ring-2 focus:ring-primary/50'
+              )}
+            >
+              {TYPE_COLORS.map(c => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={handleAddType}
+              disabled={!newTypeName.trim()}
+              className={cn(
+                'px-3 py-2 rounded-lg text-sm transition-all',
+                'bg-primary text-primary-foreground',
+                'hover:bg-primary/90',
+                'disabled:opacity-50 disabled:cursor-not-allowed'
+              )}
+            >
+              <Plus size={16} />
+            </button>
+          </div>
+
+          {/* Existing Types */}
+          <div className="space-y-2 max-h-40 overflow-y-auto">
+            {prayerTypes.map(type => (
+              <div
+                key={type.id}
+                className="flex items-center gap-2 p-2 rounded-lg bg-card/50"
+              >
+                <span className="text-lg">{type.icon}</span>
+                <span className={cn('flex-1 text-sm', type.color)}>{type.label}</span>
+                <button
+                  onClick={() => removePrayerType(type.id)}
+                  disabled={prayerTypes.length <= 1}
+                  className={cn(
+                    'p-1 rounded hover:bg-destructive/20 text-destructive transition-colors',
+                    'disabled:opacity-30 disabled:cursor-not-allowed'
+                  )}
+                  aria-label={`Remove ${type.label}`}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Add Prayer Form */}
+      <form onSubmit={handleSubmit} className="mb-4">
         {/* Type Selector */}
         <div className="flex flex-wrap gap-2 mb-3">
-          {PRAYER_TYPES.map(type => (
+          {prayerTypes.map(type => (
             <button
               key={type.id}
               type="button"
@@ -113,7 +256,7 @@ export function PrayerRequestInput() {
           />
           <button
             type="submit"
-            disabled={!content.trim()}
+            disabled={!content.trim() || !selectedType}
             className={cn(
               'flex items-center gap-2 px-4 py-2 rounded-lg transition-all',
               'bg-primary text-primary-foreground',
@@ -158,13 +301,14 @@ export function PrayerRequestInput() {
                   <span className="text-xs text-primary ml-auto">Drop here to move</span>
                 )}
               </div>
-              
+
               {/* Prayer Tiles */}
               <div className="space-y-2 pl-2">
                 {group.prayers.map(prayer => (
                   <PrayerTile
                     key={prayer.id}
                     prayer={prayer}
+                    prayerTypes={prayerTypes}
                     isDragging={draggedId === prayer.id}
                     isDragOver={dragOverId === prayer.id}
                     onDragStart={handleDragStart}
@@ -185,7 +329,7 @@ export function PrayerRequestInput() {
         {draggedId && (
           <div className="space-y-2 pt-4 border-t border-border">
             <p className="text-xs text-muted-foreground">Move to another category:</p>
-            {PRAYER_TYPES.filter(t => !groupedPrayers.find(g => g.id === t.id)).map(type => (
+            {prayerTypes.filter(t => !groupedPrayers.find(g => g.id === t.id)).map(type => (
               <div
                 key={type.id}
                 onDragOver={(e) => {
@@ -210,7 +354,7 @@ export function PrayerRequestInput() {
       </div>
 
       <p className="mt-2 text-sm text-muted-foreground">
-        Drag tiles to reorder or move between groups.
+        Drag tiles to reorder. Click "Categories" to add/remove types.
       </p>
     </div>
   );
@@ -218,6 +362,7 @@ export function PrayerRequestInput() {
 
 interface PrayerTileProps {
   prayer: PrayerRequest;
+  prayerTypes: PrayerTypeInfo[];
   isDragging: boolean;
   isDragOver: boolean;
   onDragStart: (e: React.DragEvent, prayer: PrayerRequest) => void;
@@ -231,6 +376,7 @@ interface PrayerTileProps {
 
 function PrayerTile({
   prayer,
+  prayerTypes,
   isDragging,
   isDragOver,
   onDragStart,
@@ -242,7 +388,7 @@ function PrayerTile({
   onTypeChange,
 }: PrayerTileProps) {
   const [showTypeMenu, setShowTypeMenu] = useState(false);
-  const currentType = PRAYER_TYPES.find(t => t.id === prayer.type);
+  const currentType = prayerTypes.find(t => t.id === prayer.type);
 
   return (
     <div
@@ -280,15 +426,15 @@ function PrayerTile({
             currentType?.color
           )}
         >
-          <span>{currentType?.icon}</span>
+          <span>{currentType?.icon || '🙏'}</span>
           <ChevronDown size={12} />
         </button>
 
         {showTypeMenu && (
           <>
-            <div 
-              className="fixed inset-0 z-40" 
-              onClick={() => setShowTypeMenu(false)} 
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setShowTypeMenu(false)}
             />
             <div className={cn(
               'absolute right-0 top-full mt-1 z-50',
@@ -296,7 +442,7 @@ function PrayerTile({
               'min-w-[140px] py-1',
               'animate-fade-in'
             )}>
-              {PRAYER_TYPES.map(type => (
+              {prayerTypes.map(type => (
                 <button
                   key={type.id}
                   onClick={() => {

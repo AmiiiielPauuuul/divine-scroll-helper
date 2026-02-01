@@ -3,7 +3,7 @@
 export type TabId = 'prayers' | 'birthdays' | 'weddings' | 'announcements';
 
 // Prayer request types/categories
-export type PrayerType = 'healing' | 'spiritual' | 'family' | 'financial' | 'thanksgiving' | 'other';
+export type PrayerType = string;
 
 export interface PrayerTypeInfo {
   id: PrayerType;
@@ -12,7 +12,7 @@ export interface PrayerTypeInfo {
   color: string; // Tailwind color class
 }
 
-export const PRAYER_TYPES: PrayerTypeInfo[] = [
+export const DEFAULT_PRAYER_TYPES: PrayerTypeInfo[] = [
   { id: 'healing', label: 'Healing', icon: '💚', color: 'text-green-400' },
   { id: 'spiritual', label: 'Spiritual Growth', icon: '✨', color: 'text-purple-400' },
   { id: 'family', label: 'Family', icon: '👨‍👩‍👧‍👦', color: 'text-blue-400' },
@@ -40,6 +40,7 @@ export interface TeleprompterState {
   activeTab: TabId;      // Tab being edited on controller
   displayTab: TabId;     // Tab shown on pastor's display
   tabs: Tab[];
+  prayerTypes: PrayerTypeInfo[];  // Dynamic prayer categories
   prayerRequests: PrayerRequest[];  // Typed prayer requests
   scrollSpeed: number; // 0-100, 0 = paused
   isAutoScrolling: boolean;
@@ -50,6 +51,9 @@ export interface TeleprompterContextValue extends TeleprompterState {
   setActiveTab: (tabId: TabId) => void;
   setDisplayTab: (tabId: TabId) => void;
   updateTabContent: (tabId: TabId, content: string) => void;
+  addPrayerType: (type: Omit<PrayerTypeInfo, 'id'>) => void;
+  updatePrayerTypeInfo: (id: string, updates: Partial<Omit<PrayerTypeInfo, 'id'>>) => void;
+  removePrayerType: (id: string) => void;
   addPrayerRequest: (type: PrayerType, content: string) => void;
   removePrayerRequest: (id: string) => void;
   reorderPrayerRequest: (draggedId: string, targetId: string) => void;
