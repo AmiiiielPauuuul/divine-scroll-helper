@@ -59,13 +59,12 @@ export function PrayerDisplay({ className }: PrayerDisplayProps) {
           </div>
 
           {/* Prayer Items */}
-          <div className="space-y-3 pl-4">
+          <div className="space-y-4 pl-4">
             {group.prayers.map(prayer => (
               <div
                 key={prayer.id}
                 className={cn(
                   'flex items-start gap-3',
-                  FONT_SIZE_CLASSES[fontSize],
                   'text-teleprompter-text leading-relaxed'
                 )}
               >
@@ -78,7 +77,25 @@ export function PrayerDisplay({ className }: PrayerDisplayProps) {
                 )}>
                   {group.icon}
                 </span>
-                <span>{prayer.content}</span>
+                <div className="flex flex-col">
+                  <span className={cn(
+                    'font-bold',
+                    FONT_SIZE_CLASSES[fontSize]
+                  )}>
+                    {prayer.content}
+                  </span>
+                  {prayer.specificPrayer && (
+                    <span className={cn(
+                      'italic text-teleprompter-text/80 mt-1',
+                      fontSize === 'sm' ? 'text-base' :
+                      fontSize === 'md' ? 'text-lg' :
+                      fontSize === 'lg' ? 'text-xl' :
+                      fontSize === 'xl' ? 'text-2xl' : 'text-3xl'
+                    )}>
+                      {prayer.specificPrayer}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
