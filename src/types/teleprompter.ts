@@ -25,6 +25,7 @@ export interface PrayerRequest {
   id: string;
   type: PrayerType;
   content: string;
+  specificPrayer?: string; // Optional specific prayer text (scripture, intent, etc.)
   createdAt: number;
 }
 
@@ -54,8 +55,9 @@ export interface TeleprompterContextValue extends TeleprompterState {
   addPrayerType: (type: Omit<PrayerTypeInfo, 'id'>) => void;
   updatePrayerTypeInfo: (id: string, updates: Partial<Omit<PrayerTypeInfo, 'id'>>) => void;
   removePrayerType: (id: string) => void;
-  addPrayerRequest: (type: PrayerType, content: string) => void;
+  addPrayerRequest: (type: PrayerType, content: string, specificPrayer?: string) => void;
   removePrayerRequest: (id: string) => void;
+  updatePrayerRequest: (id: string, updates: Partial<Omit<PrayerRequest, 'id' | 'createdAt'>>) => void;
   reorderPrayerRequest: (draggedId: string, targetId: string) => void;
   updatePrayerType: (id: string, type: PrayerType) => void;
   setScrollSpeed: (speed: number) => void;

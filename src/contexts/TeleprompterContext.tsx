@@ -126,16 +126,26 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
     }));
   }, []);
 
-  const addPrayerRequest = useCallback((type: PrayerType, content: string) => {
+  const addPrayerRequest = useCallback((type: PrayerType, content: string, specificPrayer?: string) => {
     const newRequest: PrayerRequest = {
       id: `prayer-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       type,
       content,
+      specificPrayer,
       createdAt: Date.now(),
     };
     setState(prev => ({
       ...prev,
       prayerRequests: [...prev.prayerRequests, newRequest],
+    }));
+  }, []);
+
+  const updatePrayerRequest = useCallback((id: string, updates: Partial<Omit<PrayerRequest, 'id' | 'createdAt'>>) => {
+    setState(prev => ({
+      ...prev,
+      prayerRequests: prev.prayerRequests.map(p =>
+        p.id === id ? { ...p, ...updates } : p
+      ),
     }));
   }, []);
 
@@ -223,6 +233,7 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
     removePrayerType,
     addPrayerRequest,
     removePrayerRequest,
+    updatePrayerRequest,
     reorderPrayerRequest,
     updatePrayerType,
     setScrollSpeed,

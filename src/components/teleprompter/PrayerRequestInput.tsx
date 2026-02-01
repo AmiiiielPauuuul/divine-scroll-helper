@@ -25,6 +25,7 @@ export function PrayerRequestInput() {
     prayerRequests,
     prayerTypes,
     removePrayerRequest,
+    updatePrayerRequest,
     reorderPrayerRequest,
     updatePrayerType,
     addPrayerType,
@@ -33,6 +34,7 @@ export function PrayerRequestInput() {
   } = useTeleprompter();
 
   const [content, setContent] = useState('');
+  const [specificPrayer, setSpecificPrayer] = useState('');
   const [selectedType, setSelectedType] = useState<PrayerType>(prayerTypes[0]?.id || '');
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
@@ -44,8 +46,9 @@ export function PrayerRequestInput() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (content.trim() && selectedType) {
-      addPrayerRequest(selectedType, content.trim());
+      addPrayerRequest(selectedType, content.trim(), specificPrayer.trim() || undefined);
       setContent('');
+      setSpecificPrayer('');
     }
   };
 
@@ -240,33 +243,49 @@ export function PrayerRequestInput() {
         </div>
 
         {/* Input */}
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            placeholder="Enter prayer request..."
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={content}
+              onChange={e => setContent(e.target.value)}
+              placeholder="Person's name or request..."
+              className={cn(
+                'flex-1 px-4 py-2 rounded-lg',
+                'bg-card text-card-foreground',
+                'border border-border',
+                'placeholder:text-muted-foreground/60',
+                'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary'
+              )}
+            />
+            <button
+              type="submit"
+              disabled={!content.trim() || !selectedType}
+              className={cn(
+                'flex items-center gap-2 px-4 py-2 rounded-lg transition-all',
+                'bg-primary text-primary-foreground',
+                'hover:bg-primary/90',
+                'disabled:opacity-50 disabled:cursor-not-allowed'
+              )}
+            >
+              <Plus size={18} />
+              <span>Add</span>
+            </button>
+          </div>
+          <textarea
+            value={specificPrayer}
+            onChange={e => setSpecificPrayer(e.target.value)}
+            placeholder="Specific prayer (optional): scripture, healing from surgery, guidance for decisions..."
+            rows={2}
             className={cn(
-              'flex-1 px-4 py-2 rounded-lg',
+              'w-full px-4 py-2 rounded-lg resize-none',
               'bg-card text-card-foreground',
               'border border-border',
               'placeholder:text-muted-foreground/60',
-              'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary'
+              'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary',
+              'text-sm'
             )}
           />
-          <button
-            type="submit"
-            disabled={!content.trim() || !selectedType}
-            className={cn(
-              'flex items-center gap-2 px-4 py-2 rounded-lg transition-all',
-              'bg-primary text-primary-foreground',
-              'hover:bg-primary/90',
-              'disabled:opacity-50 disabled:cursor-not-allowed'
-            )}
-          >
-            <Plus size={18} />
-            <span>Add</span>
-          </button>
         </div>
       </form>
 
@@ -318,6 +337,7 @@ export function PrayerRequestInput() {
                     onDragEnd={handleDragEnd}
                     onRemove={removePrayerRequest}
                     onTypeChange={updatePrayerType}
+                    onUpdatePrayer={updatePrayerRequest}
                   />
                 ))}
               </div>
@@ -372,6 +392,7 @@ interface PrayerTileProps {
   onDragEnd: () => void;
   onRemove: (id: string) => void;
   onTypeChange: (id: string, type: PrayerType) => void;
+  onUpdatePrayer: (id: string, updates: Partial<Omit<PrayerRequest, 'id' | 'createdAt'>>) => void;
 }
 
 function PrayerTile({
@@ -386,9 +407,17 @@ function PrayerTile({
   onDragEnd,
   onRemove,
   onTypeChange,
+  onUpdatePrayer,
 }: PrayerTileProps) {
   const [showTypeMenu, setShowTypeMenu] = useState(false);
+  const [isEditingPrayer, setIsEditingPrayer] = useState(false);
+  const [editedSpecificPrayer, setEditedSpecificPrayer] = useState(prayer.specificPrayer || '');
   const currentType = prayerTypes.find(t => t.id === prayer.type);
+
+  const handleSaveSpecificPrayer = () => {
+    onUpdatePrayer(prayer.id, { specificPrayer: editedSpecificPrayer.trim() || undefined });
+    setIsEditingPrayer(false);
+  };
 
   return (
     <div
@@ -414,7 +443,45 @@ function PrayerTile({
       </div>
 
       {/* Content */}
-      <span className="text-sm text-foreground flex-1">{prayer.content}</span>
+      <div className="flex-1 min-w-0">
+        <span className="text-sm font-semibold text-foreground">{prayer.content}</span>
+        {isEditingPrayer ? (
+          <div className="mt-1 flex gap-1">
+            <input
+              type="text"
+              value={editedSpecificPrayer}
+              onChange={e => setEditedSpecificPrayer(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') handleSaveSpecificPrayer();
+                if (e.key === 'Escape') setIsEditingPrayer(false);
+              }}
+              placeholder="Add specific prayer..."
+              className={cn(
+                'flex-1 px-2 py-1 rounded text-xs',
+                'bg-background border border-border',
+                'focus:outline-none focus:ring-1 focus:ring-primary/50'
+              )}
+              autoFocus
+            />
+            <button
+              onClick={handleSaveSpecificPrayer}
+              className="px-2 py-1 rounded text-xs bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Save
+            </button>
+          </div>
+        ) : (
+          <div
+            onClick={() => setIsEditingPrayer(true)}
+            className={cn(
+              'text-xs mt-0.5 cursor-pointer hover:text-primary transition-colors',
+              prayer.specificPrayer ? 'text-muted-foreground italic' : 'text-muted-foreground/50'
+            )}
+          >
+            {prayer.specificPrayer || 'Click to add specific prayer...'}
+          </div>
+        )}
+      </div>
 
       {/* Type Selector */}
       <div className="relative">
