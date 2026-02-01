@@ -12,15 +12,15 @@ import { RotateCcw } from 'lucide-react';
 
 function DisplayContent() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { setActiveTab, tabs, activeTab } = useTeleprompter();
+  const { setDisplayTab, tabs, displayTab } = useTeleprompter();
 
   // Touch handling for swipe between tabs
   const handleSwipe = (direction: 'left' | 'right') => {
-    const currentIndex = tabs.findIndex(t => t.id === activeTab);
+    const currentIndex = tabs.findIndex(t => t.id === displayTab);
     if (direction === 'left' && currentIndex < tabs.length - 1) {
-      setActiveTab(tabs[currentIndex + 1].id);
+      setDisplayTab(tabs[currentIndex + 1].id);
     } else if (direction === 'right' && currentIndex > 0) {
-      setActiveTab(tabs[currentIndex - 1].id);
+      setDisplayTab(tabs[currentIndex - 1].id);
     }
   };
 

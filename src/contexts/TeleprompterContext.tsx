@@ -27,6 +27,7 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
           const parsed = JSON.parse(saved);
           return {
             activeTab: parsed.activeTab || 'prayers',
+            displayTab: parsed.displayTab || 'prayers',
             tabs: parsed.tabs || DEFAULT_TABS,
             scrollSpeed: parsed.scrollSpeed ?? 30,
             isAutoScrolling: parsed.isAutoScrolling ?? false,
@@ -39,6 +40,7 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
     }
     return {
       activeTab: 'prayers',
+      displayTab: 'prayers',
       tabs: DEFAULT_TABS,
       scrollSpeed: 30,
       isAutoScrolling: false,
@@ -103,6 +105,10 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
     setState(prev => ({ ...prev, activeTab: tabId }));
   }, []);
 
+  const setDisplayTab = useCallback((tabId: TabId) => {
+    setState(prev => ({ ...prev, displayTab: tabId }));
+  }, []);
+
   const updateTabContent = useCallback((tabId: TabId, content: string) => {
     setState(prev => ({
       ...prev,
@@ -127,6 +133,7 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
   const value: TeleprompterContextValue = {
     ...state,
     setActiveTab,
+    setDisplayTab,
     updateTabContent,
     setScrollSpeed,
     toggleAutoScroll,
