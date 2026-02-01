@@ -5,3 +5,5 @@ export { FontSizeControl } from './FontSizeControl';
 export { ContentEditor } from './ContentEditor';
 export { TeleprompterDisplay } from './TeleprompterDisplay';
 export { FullscreenButton } from './FullscreenButton';
+export { PrayerRequestInput } from './PrayerRequestInput';
+export { PrayerDisplay } from './PrayerDisplay';
