@@ -88,7 +88,7 @@ export function TeleprompterDisplay({ className, showTabIndicator = true }: Tele
         ref={scrollRef}
         className={cn(
           'flex-1 overflow-y-auto teleprompter-scroll teleprompter-fade-both',
-          'px-4 sm:px-6 lg:px-8 py-20 sm:py-24 touch-pan-y'
+          'px-4 sm:px-6 lg:px-8 pt-20 pb-12 sm:pt-24 sm:pb-16 touch-pan-y'
         )}
         style={{ scrollBehavior: isAutoScrolling ? 'auto' : 'smooth' }}
       >
@@ -110,8 +110,6 @@ export function TeleprompterDisplay({ className, showTabIndicator = true }: Tele
           </div>
         )}
         
-        {/* Extra padding at bottom for scroll */}
-        <div className="h-[50vh]" aria-hidden="true" />
       </div>
 
       {/* Scroll Progress Indicator */}

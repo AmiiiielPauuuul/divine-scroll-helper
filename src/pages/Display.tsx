@@ -1,14 +1,10 @@
 import { useRef } from 'react';
 import { TeleprompterProvider, useTeleprompter } from '@/contexts/TeleprompterContext';
 import {
-  TabSelector,
-  ScrollControls,
-  FontSizeControl,
   TeleprompterDisplay,
   FullscreenButton,
 } from '@/components/teleprompter';
 import { cn } from '@/lib/utils';
-import { RotateCcw } from 'lucide-react';
 
 function DisplayContent() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,18 +27,14 @@ function DisplayContent() {
     >
       {/* Top Control Bar - Minimal for iPad */}
       <div className="absolute top-0 left-0 right-0 z-20 p-4 flex items-center justify-between bg-gradient-to-b from-teleprompter-bg via-teleprompter-bg/80 to-transparent">
-        <TabSelector variant="compact" />
-        
-        <div className="flex items-center gap-3">
-          <ScrollControls showSpeedValue={false} />
-          <FontSizeControl />
+        <div className="flex items-center gap-3 ml-auto">
           <FullscreenButton />
         </div>
       </div>
 
       {/* Main Display Area */}
       <div
-        className="flex-1 pt-20"
+        className="flex-1 pt-16 sm:pt-18"
         onTouchStart={(e) => {
           const touch = e.touches[0];
           (e.currentTarget as any)._touchStartX = touch.clientX;
@@ -59,25 +51,6 @@ function DisplayContent() {
         <TeleprompterDisplay className="h-full" />
       </div>
 
-      {/* Bottom Quick Actions */}
-      <div className="absolute bottom-4 left-4 z-20">
-        <button
-          onClick={() => {
-            // Scroll to top
-            const scrollArea = document.querySelector('.teleprompter-scroll');
-            if (scrollArea) scrollArea.scrollTop = 0;
-          }}
-          className={cn(
-            'flex items-center gap-2 px-4 py-2 rounded-full',
-            'bg-secondary/50 text-secondary-foreground hover:bg-secondary/80',
-            'backdrop-blur-sm transition-all duration-200'
-          )}
-          aria-label="Scroll to top"
-        >
-          <RotateCcw size={16} />
-          <span className="text-sm">Reset</span>
-        </button>
-      </div>
     </div>
   );
 }

@@ -13,12 +13,12 @@ export interface PrayerTypeInfo {
 }
 
 export const DEFAULT_PRAYER_TYPES: PrayerTypeInfo[] = [
-  { id: 'healing', label: 'Healing', icon: '💚', color: 'text-green-400' },
-  { id: 'spiritual', label: 'Spiritual Growth', icon: '✨', color: 'text-purple-400' },
-  { id: 'family', label: 'Family', icon: '👨‍👩‍👧‍👦', color: 'text-blue-400' },
-  { id: 'financial', label: 'Financial', icon: '💰', color: 'text-yellow-400' },
-  { id: 'thanksgiving', label: 'Thanksgiving', icon: '🙌', color: 'text-orange-400' },
-  { id: 'other', label: 'Other', icon: '🙏', color: 'text-muted-foreground' },
+  { id: 'healing', label: 'Healing', icon: '💚', color: 'text-sky-400' },
+  { id: 'spiritual', label: 'Spiritual Growth', icon: '✨', color: 'text-sky-500' },
+  { id: 'family', label: 'Family', icon: '👨‍👩‍👧‍👦', color: 'text-blue-500' },
+  { id: 'financial', label: 'Financial', icon: '💰', color: 'text-indigo-500' },
+  { id: 'thanksgiving', label: 'Thanksgiving', icon: '🙌', color: 'text-cyan-400' },
+  { id: 'other', label: 'Other', icon: '🙏', color: 'text-slate-300' },
 ];
 
 export interface PrayerRequest {

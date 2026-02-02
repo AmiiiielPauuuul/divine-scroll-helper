@@ -36,17 +36,9 @@ export function PrayerDisplay({ className }: PrayerDisplayProps) {
         <div key={group.id} className="space-y-4">
           {/* Category Header */}
           <div className={cn(
-            'flex items-center gap-3 pb-2 border-b border-teleprompter-text/20',
+            'flex items-center',
             group.color
           )}>
-            <span className={cn(
-              fontSize === 'sm' ? 'text-2xl' :
-              fontSize === 'md' ? 'text-3xl' :
-              fontSize === 'lg' ? 'text-4xl' :
-              fontSize === 'xl' ? 'text-5xl' : 'text-6xl'
-            )}>
-              {group.icon}
-            </span>
             <h2 className={cn(
               'font-semibold text-teleprompter-text',
               fontSize === 'sm' ? 'text-xl' :
@@ -64,20 +56,11 @@ export function PrayerDisplay({ className }: PrayerDisplayProps) {
               <div
                 key={prayer.id}
                 className={cn(
-                  'flex items-start gap-3',
+                  'flex items-start',
                   'text-teleprompter-text leading-relaxed',
                   prayer.completed && 'opacity-50'
                 )}
               >
-                <span className={cn(
-                  'flex-shrink-0',
-                  fontSize === 'sm' ? 'text-lg' :
-                  fontSize === 'md' ? 'text-xl' :
-                  fontSize === 'lg' ? 'text-2xl' :
-                  fontSize === 'xl' ? 'text-3xl' : 'text-4xl'
-                )}>
-                  {group.icon}
-                </span>
                 <div className="flex flex-col">
                   <span className={cn(
                     'font-bold',
@@ -88,11 +71,11 @@ export function PrayerDisplay({ className }: PrayerDisplayProps) {
                   </span>
                   {prayer.specificPrayer && (
                     <span className={cn(
-                      'italic text-teleprompter-text/80 mt-1',
-                      fontSize === 'sm' ? 'text-base' :
-                      fontSize === 'md' ? 'text-lg' :
-                      fontSize === 'lg' ? 'text-xl' :
-                      fontSize === 'xl' ? 'text-2xl' : 'text-3xl',
+                      'italic text-teleprompter-text/80 mt-1 pl-4',
+                      fontSize === 'sm' ? 'text-sm' :
+                      fontSize === 'md' ? 'text-base' :
+                      fontSize === 'lg' ? 'text-lg' :
+                      fontSize === 'xl' ? 'text-xl' : 'text-2xl',
                       prayer.completed && 'line-through text-teleprompter-text/60'
                     )}>
                       {prayer.specificPrayer}

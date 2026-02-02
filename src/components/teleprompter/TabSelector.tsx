@@ -5,9 +5,10 @@ import { cn } from '@/lib/utils';
 interface TabSelectorProps {
   variant?: 'compact' | 'full';
   className?: string;
+  showIcons?: boolean;
 }
 
-export function TabSelector({ variant = 'full', className }: TabSelectorProps) {
+export function TabSelector({ variant = 'full', className, showIcons = true }: TabSelectorProps) {
   const { tabs, activeTab, setActiveTab } = useTeleprompter();
 
   return (
@@ -26,10 +27,14 @@ export function TabSelector({ variant = 'full', className }: TabSelectorProps) {
           )}
           aria-pressed={activeTab === tab.id}
         >
-          <span className="text-lg" role="img" aria-label={tab.label}>
-            {tab.icon}
-          </span>
-          {variant === 'full' && <span>{tab.label}</span>}
+          {showIcons && (
+            <span className="text-lg" role="img" aria-label={tab.label}>
+              {tab.icon}
+            </span>
+          )}
+          {variant === 'full' && (
+            <span className="max-w-[8.5rem] truncate" title={tab.label}>{tab.label}</span>
+          )}
         </button>
       ))}
     </div>

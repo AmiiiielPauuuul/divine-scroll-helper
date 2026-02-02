@@ -2,22 +2,14 @@ import { useState } from 'react';
 import { useTeleprompter } from '@/contexts/TeleprompterContext';
 import { PrayerType, PrayerRequest, PrayerTypeInfo } from '@/types/teleprompter';
 import { cn } from '@/lib/utils';
-import { Plus, X, GripVertical, ChevronDown, Settings, Trash2 } from 'lucide-react';
+import { Plus, X, GripVertical, Settings, Trash2 } from 'lucide-react';
 
 // Available colors for prayer types
 const TYPE_COLORS = [
-  { label: 'Green', value: 'text-green-400' },
-  { label: 'Purple', value: 'text-purple-400' },
-  { label: 'Blue', value: 'text-blue-400' },
-  { label: 'Yellow', value: 'text-yellow-400' },
-  { label: 'Orange', value: 'text-orange-400' },
-  { label: 'Red', value: 'text-red-400' },
-  { label: 'Pink', value: 'text-pink-400' },
-  { label: 'Teal', value: 'text-teal-400' },
+  { label: 'Red', value: 'text-red-500' },
+  { label: 'Yellow', value: 'text-yellow-500' },
+  { label: 'Blue', value: 'text-blue-500' },
 ];
-
-// Common emoji options for quick selection
-const COMMON_EMOJIS = ['🙏', '💚', '✨', '👨‍👩‍👧‍👦', '💰', '🙌', '❤️', '🎓', '💼', '🏠', '✝️', '📖'];
 
 export function PrayerRequestInput() {
   const {
@@ -29,7 +21,6 @@ export function PrayerRequestInput() {
     reorderPrayerRequest,
     updatePrayerType,
     addPrayerType,
-    updatePrayerTypeInfo,
     removePrayerType,
   } = useTeleprompter();
 
@@ -40,8 +31,7 @@ export function PrayerRequestInput() {
   const [dragOverId, setDragOverId] = useState<string | null>(null);
   const [showTypeManager, setShowTypeManager] = useState(false);
   const [newTypeName, setNewTypeName] = useState('');
-  const [newTypeIcon, setNewTypeIcon] = useState('🙏');
-  const [newTypeColor, setNewTypeColor] = useState('text-blue-400');
+  const [newTypeColor, setNewTypeColor] = useState('text-blue-500');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,12 +46,11 @@ export function PrayerRequestInput() {
     if (newTypeName.trim()) {
       addPrayerType({
         label: newTypeName.trim(),
-        icon: newTypeIcon,
+        icon: '🙏',
         color: newTypeColor,
       });
       setNewTypeName('');
-      setNewTypeIcon('🙏');
-      setNewTypeColor('text-blue-400');
+      setNewTypeColor('text-blue-500');
     }
   };
 
@@ -141,19 +130,6 @@ export function PrayerRequestInput() {
 
           {/* Add New Type */}
           <div className="flex gap-2 mb-3">
-            <div className="relative">
-              <button
-                type="button"
-                className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-xl hover:bg-card/80"
-                onClick={() => {
-                  const currentIndex = COMMON_EMOJIS.indexOf(newTypeIcon);
-                  const nextIndex = (currentIndex + 1) % COMMON_EMOJIS.length;
-                  setNewTypeIcon(COMMON_EMOJIS[nextIndex]);
-                }}
-              >
-                {newTypeIcon}
-              </button>
-            </div>
             <input
               type="text"
               value={newTypeName}
@@ -201,7 +177,6 @@ export function PrayerRequestInput() {
                 key={type.id}
                 className="flex items-center gap-2 p-2 rounded-lg bg-card/50"
               >
-                <span className="text-lg">{type.icon}</span>
                 <span className={cn('flex-1 text-sm', type.color)}>{type.label}</span>
                 <button
                   onClick={() => removePrayerType(type.id)}
@@ -467,7 +442,7 @@ function PrayerTile({
           {prayer.content}
         </span>
         {isEditingPrayer ? (
-          <div className="mt-1 flex gap-1">
+          <div className="mt-1 flex gap-1 pl-4">
             <input
               type="text"
               value={editedSpecificPrayer}
@@ -478,7 +453,7 @@ function PrayerTile({
               }}
               placeholder="Add specific prayer..."
               className={cn(
-                'flex-1 px-2 py-1 rounded text-xs',
+                'flex-1 px-2 py-1 rounded text-[11px]',
                 'bg-background border border-border',
                 'focus:outline-none focus:ring-1 focus:ring-primary/50'
               )}
@@ -495,7 +470,7 @@ function PrayerTile({
           <div
             onClick={() => setIsEditingPrayer(true)}
             className={cn(
-              'text-xs mt-0.5 cursor-pointer hover:text-primary transition-colors',
+              'text-[11px] mt-0.5 cursor-pointer hover:text-primary transition-colors pl-4',
               prayer.specificPrayer ? 'text-muted-foreground italic' : 'text-muted-foreground/50',
               prayer.completed && 'line-through text-muted-foreground/70'
             )}

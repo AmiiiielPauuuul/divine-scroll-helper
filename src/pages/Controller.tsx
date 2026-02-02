@@ -2,8 +2,6 @@ import { TeleprompterProvider, useTeleprompter } from '@/contexts/TeleprompterCo
 import {
   TabSelector,
   DisplayTabSelector,
-  ScrollControls,
-  FontSizeControl,
   ContentEditor,
   TeleprompterDisplay,
   PrayerRequestInput,
@@ -101,9 +99,6 @@ function ControllerContent() {
                   Showing: {displayTabData?.label}
                 </h2>
               </div>
-              <div className="flex items-center gap-3">
-                <ScrollControls />
-              </div>
             </div>
 
             {/* Preview Display */}
@@ -112,13 +107,7 @@ function ControllerContent() {
             </div>
 
             {/* Font Size Control */}
-            <div className="p-4 border-t border-border bg-card/50 flex items-center justify-between">
-              <FontSizeControl />
-              
-              <div className="text-xs text-muted-foreground">
-                Swipe on iPad to change tabs
-              </div>
-            </div>
+            <div className="p-4 border-t border-border bg-card/50" />
           </div>
         </div>
       </main>
@@ -127,7 +116,6 @@ function ControllerContent() {
       <footer className="border-t border-border py-3">
         <div className="container max-w-7xl mx-auto px-4">
           <p className="text-center text-sm text-muted-foreground">
-            Open the <strong>Display</strong> page on iPad for the pastor's view
           </p>
         </div>
       </footer>

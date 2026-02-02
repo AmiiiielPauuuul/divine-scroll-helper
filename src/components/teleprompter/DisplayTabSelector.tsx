@@ -21,7 +21,7 @@ export function DisplayTabSelector({ className }: DisplayTabSelectorProps) {
             key={tab.id}
             onClick={() => setDisplayTab(tab.id)}
             className={cn(
-              'flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 text-sm shrink-0 whitespace-nowrap',
+              'flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 shrink-0 whitespace-nowrap',
               'focus:outline-none focus:ring-2 focus:ring-primary/50',
               displayTab === tab.id
                 ? 'bg-green-600 text-white shadow-lg shadow-green-600/30'
@@ -33,7 +33,7 @@ export function DisplayTabSelector({ className }: DisplayTabSelectorProps) {
             <span role="img" aria-label={tab.label}>
               {tab.icon}
             </span>
-            <span>{tab.label}</span>
+            <span className="max-w-[8.5rem] truncate" title={tab.label}>{tab.label}</span>
           </button>
         ))}
       </div>
