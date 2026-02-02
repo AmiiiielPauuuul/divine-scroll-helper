@@ -88,7 +88,7 @@ export function TeleprompterDisplay({ className, showTabIndicator = true }: Tele
         ref={scrollRef}
         className={cn(
           'flex-1 overflow-y-auto teleprompter-scroll teleprompter-fade-both',
-          'px-8 py-24 touch-pan-y'
+          'px-4 sm:px-6 lg:px-8 py-20 sm:py-24 touch-pan-y'
         )}
         style={{ scrollBehavior: isAutoScrolling ? 'auto' : 'smooth' }}
       >

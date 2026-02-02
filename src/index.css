@@ -104,6 +104,29 @@
   }
 }
 
+@media (max-width: 640px) {
+  .text-teleprompter-sm {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+  .text-teleprompter-md {
+    font-size: 1.375rem;
+    line-height: 2.25rem;
+  }
+  .text-teleprompter-lg {
+    font-size: 1.625rem;
+    line-height: 2.5rem;
+  }
+  .text-teleprompter-xl {
+    font-size: 1.875rem;
+    line-height: 2.75rem;
+  }
+  .text-teleprompter-2xl {
+    font-size: 2.125rem;
+    line-height: 3.25rem;
+  }
+}
+
 @layer components {
   /* Smooth scrolling for teleprompter */
   .teleprompter-scroll {

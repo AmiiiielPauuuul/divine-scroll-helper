@@ -15,13 +15,13 @@ export function DisplayTabSelector({ className }: DisplayTabSelectorProps) {
         <Monitor size={14} />
         <span>Pastor's Display</span>
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-2 overflow-x-auto flex-nowrap pb-1">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setDisplayTab(tab.id)}
             className={cn(
-              'flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 text-sm',
+              'flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 text-sm shrink-0 whitespace-nowrap',
               'focus:outline-none focus:ring-2 focus:ring-primary/50',
               displayTab === tab.id
                 ? 'bg-green-600 text-white shadow-lg shadow-green-600/30'

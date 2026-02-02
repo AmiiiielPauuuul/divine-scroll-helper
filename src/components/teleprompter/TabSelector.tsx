@@ -11,13 +11,13 @@ export function TabSelector({ variant = 'full', className }: TabSelectorProps) {
   const { tabs, activeTab, setActiveTab } = useTeleprompter();
 
   return (
-    <div className={cn('flex gap-2', className)}>
+    <div className={cn('flex gap-2 overflow-x-auto flex-nowrap pb-1', className)}>
       {tabs.map(tab => (
         <button
           key={tab.id}
           onClick={() => setActiveTab(tab.id)}
           className={cn(
-            'flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200',
+            'flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 shrink-0 whitespace-nowrap',
             'focus:outline-none focus:ring-2 focus:ring-primary/50',
             activeTab === tab.id
               ? 'bg-primary text-primary-foreground tab-glow'

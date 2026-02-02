@@ -22,7 +22,7 @@ function ControllerContent() {
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/20">
                 <Monitor className="text-primary" size={20} />
@@ -33,12 +33,12 @@ function ControllerContent() {
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 w-full sm:w-auto">
               <Link
                 to="/display"
                 target="_blank"
                 className={cn(
-                  'flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200',
+                  'flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 w-full sm:w-auto',
                   'bg-primary text-primary-foreground hover:bg-primary/90',
                   'focus:outline-none focus:ring-2 focus:ring-primary/50'
                 )}
@@ -52,10 +52,10 @@ function ControllerContent() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 container max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-12rem)]">
+      <main className="flex-1 container max-w-7xl mx-auto px-4 py-4 sm:py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 h-auto lg:h-[calc(100vh-12rem)]">
           {/* Left Panel - Editor */}
-          <div className="flex flex-col bg-card rounded-xl border border-border overflow-hidden">
+          <div className="flex flex-col bg-card rounded-xl border border-border overflow-hidden min-h-[70vh] lg:min-h-0">
             {/* Tab Selector for Editing */}
             <div className="p-4 border-b border-border bg-card/50">
               <p className="text-xs text-muted-foreground mb-2">Edit content for:</p>
@@ -63,7 +63,7 @@ function ControllerContent() {
             </div>
 
             {/* Content Editor - Show PrayerRequestInput for prayers tab */}
-            <div className="flex-1 p-4 overflow-hidden">
+            <div className="flex-1 p-4 overflow-auto">
               {activeTab === 'prayers' ? (
                 <PrayerRequestInput />
               ) : (
@@ -87,7 +87,7 @@ function ControllerContent() {
           </div>
 
           {/* Right Panel - Preview & Display Control */}
-          <div className="flex flex-col bg-card rounded-xl border border-border overflow-hidden">
+          <div className="flex flex-col bg-card rounded-xl border border-border overflow-hidden min-h-[60vh] lg:min-h-0">
             {/* Display Tab Selector */}
             <div className="p-4 border-b border-border bg-card/50">
               <DisplayTabSelector />
@@ -107,7 +107,7 @@ function ControllerContent() {
             </div>
 
             {/* Preview Display */}
-            <div className="flex-1 overflow-hidden rounded-b-xl">
+            <div className="flex-1 overflow-hidden rounded-b-xl min-h-[50vh] lg:min-h-0">
               <TeleprompterDisplay showTabIndicator={false} />
             </div>
 
