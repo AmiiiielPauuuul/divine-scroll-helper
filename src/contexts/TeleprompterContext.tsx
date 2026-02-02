@@ -72,7 +72,16 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
   const wsUrlFromEnv = typeof import.meta !== 'undefined'
     ? (import.meta as { env?: Record<string, string> }).env?.[WS_ENV_KEY]
     : undefined;
-  const wsUrl = wsUrlFromEnv || (
+
+  const normalizeWsUrl = (raw?: string) => {
+    if (!raw) return undefined;
+    let url = raw.trim();
+    if (url.startsWith('https://')) url = `wss://${url.slice('https://'.length)}`;
+    if (url.startsWith('http://')) url = `ws://${url.slice('http://'.length)}`;
+    return url.replace(/\/+$/, '');
+  };
+
+  const wsUrl = normalizeWsUrl(wsUrlFromEnv) || (
     typeof window !== 'undefined'
       ? `ws://${window.location.hostname}:5174`
       : undefined
