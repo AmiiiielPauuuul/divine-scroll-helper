@@ -85,9 +85,18 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
-    const handleMessage = (event: MessageEvent) => {
+    const handleMessage = async (event: MessageEvent) => {
       try {
-        const payload = JSON.parse(event.data as string);
+        let rawData: string;
+        if (event.data instanceof Blob) {
+          rawData = await event.data.text();
+        } else if (event.data instanceof ArrayBuffer) {
+          rawData = new TextDecoder().decode(event.data);
+        } else {
+          rawData = String(event.data);
+        }
+
+        const payload = JSON.parse(rawData);
         if (payload?.type !== 'STATE_UPDATE') return;
         if (payload?.origin === clientIdRef.current) return;
 
