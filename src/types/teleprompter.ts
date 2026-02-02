@@ -58,6 +58,7 @@ export interface TeleprompterContextValue extends TeleprompterState {
   removePrayerType: (id: string) => void;
   addPrayerRequest: (type: PrayerType, content: string, specificPrayer?: string) => void;
   removePrayerRequest: (id: string) => void;
+  clearPrayerRequests: () => void;
   updatePrayerRequest: (id: string, updates: Partial<Omit<PrayerRequest, 'id' | 'createdAt'>>) => void;
   reorderPrayerRequest: (draggedId: string, targetId: string) => void;
   updatePrayerType: (id: string, type: PrayerType) => void;

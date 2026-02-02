@@ -22,6 +22,7 @@ export function PrayerRequestInput() {
     updatePrayerType,
     addPrayerType,
     removePrayerType,
+    clearPrayerRequests,
   } = useTeleprompter();
 
   const [content, setContent] = useState('');
@@ -127,18 +128,37 @@ export function PrayerRequestInput() {
           <span className="text-2xl">🙏</span>
           <h2 className="text-xl font-semibold text-foreground">Prayer Requests</h2>
         </div>
-        <button
-          onClick={() => setShowTypeManager(!showTypeManager)}
-          className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all',
-            showTypeManager
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-          )}
-        >
-          <Settings size={14} />
-          <span>Categories</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              if (!prayerRequests.length) return;
+              const confirmed = window.confirm('Clear all prayer requests? This cannot be undone.');
+              if (confirmed) clearPrayerRequests();
+            }}
+            disabled={!prayerRequests.length}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all',
+              'bg-destructive/10 text-destructive hover:bg-destructive/20',
+              'disabled:opacity-40 disabled:cursor-not-allowed'
+            )}
+          >
+            <Trash2 size={14} />
+            <span>Clear All</span>
+          </button>
+          <button
+            onClick={() => setShowTypeManager(!showTypeManager)}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all',
+              showTypeManager
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+            )}
+          >
+            <Settings size={14} />
+            <span>Categories</span>
+          </button>
+        </div>
       </div>
 
       {/* Type Manager Panel */}

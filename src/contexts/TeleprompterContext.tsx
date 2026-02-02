@@ -27,6 +27,8 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
   const clientIdRef = useRef(`client-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
   const wsRef = useRef<WebSocket | null>(null);
   const skipWsBroadcastRef = useRef(false);
+  const wsRetryRef = useRef<number | null>(null);
+  const wsAttemptsRef = useRef(0);
   const [state, setState] = useState<TeleprompterState>(() => {
     // Load initial state from localStorage
     if (typeof window !== 'undefined') {
@@ -83,7 +85,7 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
 
   const wsUrl = normalizeWsUrl(wsUrlFromEnv) || (
     typeof window !== 'undefined'
-      ? `ws://${window.location.hostname}:5174`
+      ? `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.hostname}:5174`
       : undefined
   );
 
@@ -91,42 +93,79 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
   useEffect(() => {
     if (!wsUrl) return;
 
-    const ws = new WebSocket(wsUrl);
-    wsRef.current = ws;
+    let isActive = true;
 
-    const handleMessage = async (event: MessageEvent) => {
-      try {
-        let rawData: string;
-        if (event.data instanceof Blob) {
-          rawData = await event.data.text();
-        } else if (event.data instanceof ArrayBuffer) {
-          rawData = new TextDecoder().decode(event.data);
-        } else {
-          rawData = String(event.data);
-        }
-
-        const payload = JSON.parse(rawData);
-        if (payload?.type !== 'STATE_UPDATE') return;
-        if (payload?.origin === clientIdRef.current) return;
-
-        skipWsBroadcastRef.current = true;
-        setState(prev => {
-          const incoming = payload.state as TeleprompterState;
-          if (!incoming) return prev;
-          if (JSON.stringify(prev) === JSON.stringify(incoming)) return prev;
-          return incoming;
-        });
-      } catch (e) {
-        console.error('Failed to parse WebSocket message:', e);
+    const connect = () => {
+      if (!isActive) return;
+      if (wsRef.current && (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)) {
+        return;
       }
+
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+
+      const handleMessage = async (event: MessageEvent) => {
+        try {
+          let rawData: string;
+          if (event.data instanceof Blob) {
+            rawData = await event.data.text();
+          } else if (event.data instanceof ArrayBuffer) {
+            rawData = new TextDecoder().decode(event.data);
+          } else {
+            rawData = String(event.data);
+          }
+
+          const payload = JSON.parse(rawData);
+          if (payload?.type !== 'STATE_UPDATE') return;
+          if (payload?.origin === clientIdRef.current) return;
+
+          skipWsBroadcastRef.current = true;
+          setState(prev => {
+            const incoming = payload.state as TeleprompterState;
+            if (!incoming) return prev;
+            if (JSON.stringify(prev) === JSON.stringify(incoming)) return prev;
+            return incoming;
+          });
+        } catch (e) {
+          console.error('Failed to parse WebSocket message:', e);
+        }
+      };
+
+      const scheduleReconnect = () => {
+        if (!isActive) return;
+        wsAttemptsRef.current += 1;
+        const delay = Math.min(10000, 1000 * wsAttemptsRef.current);
+        if (wsRetryRef.current) window.clearTimeout(wsRetryRef.current);
+        wsRetryRef.current = window.setTimeout(connect, delay);
+      };
+
+      ws.addEventListener('open', () => {
+        wsAttemptsRef.current = 0;
+      });
+
+      ws.addEventListener('message', handleMessage);
+
+      ws.addEventListener('error', scheduleReconnect);
+      ws.addEventListener('close', scheduleReconnect);
+
+      return () => {
+        ws.removeEventListener('message', handleMessage);
+        ws.removeEventListener('error', scheduleReconnect);
+        ws.removeEventListener('close', scheduleReconnect);
+        ws.close();
+      };
     };
 
-    ws.addEventListener('message', handleMessage);
+    const cleanup = connect();
 
     return () => {
-      ws.removeEventListener('message', handleMessage);
-      ws.close();
-      if (wsRef.current === ws) {
+      isActive = false;
+      if (wsRetryRef.current) window.clearTimeout(wsRetryRef.current);
+      wsRetryRef.current = null;
+      wsAttemptsRef.current = 0;
+      if (cleanup) cleanup();
+      if (wsRef.current) {
+        wsRef.current.close();
         wsRef.current = null;
       }
     };
@@ -240,6 +279,13 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
     }));
   }, []);
 
+  const clearPrayerRequests = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      prayerRequests: [],
+    }));
+  }, []);
+
   const reorderPrayerRequest = useCallback((draggedId: string, targetId: string) => {
     setState(prev => {
       const prayers = [...prev.prayerRequests];
@@ -317,6 +363,7 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
     removePrayerType,
     addPrayerRequest,
     removePrayerRequest,
+    clearPrayerRequests,
     updatePrayerRequest,
     reorderPrayerRequest,
     updatePrayerType,
