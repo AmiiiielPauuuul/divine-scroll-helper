@@ -29,6 +29,7 @@ export function PrayerRequestInput() {
   const [selectedType, setSelectedType] = useState<PrayerType>(prayerTypes[0]?.id || '');
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [dragOverGroupId, setDragOverGroupId] = useState<string | null>(null);
   const [showTypeManager, setShowTypeManager] = useState(false);
   const [newTypeName, setNewTypeName] = useState('');
   const [newTypeColor, setNewTypeColor] = useState('text-blue-500');
@@ -78,27 +79,44 @@ export function PrayerRequestInput() {
     setDragOverId(null);
   };
 
+  const handleDragOverCategory = (e: React.DragEvent, groupId: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (groupId !== dragOverGroupId) {
+      setDragOverGroupId(groupId);
+    }
+  };
+
+  const handleDragLeaveCategory = () => {
+    setDragOverGroupId(null);
+  };
+
   const handleDrop = (e: React.DragEvent, targetId: string) => {
     e.preventDefault();
+    e.stopPropagation();
     if (draggedId && draggedId !== targetId) {
       reorderPrayerRequest(draggedId, targetId);
     }
     setDraggedId(null);
     setDragOverId(null);
+    setDragOverGroupId(null);
   };
 
   const handleDragEnd = () => {
     setDraggedId(null);
     setDragOverId(null);
+    setDragOverGroupId(null);
   };
 
   const handleDropOnCategory = (e: React.DragEvent, newType: PrayerType) => {
     e.preventDefault();
+    e.stopPropagation();
     if (draggedId) {
       updatePrayerType(draggedId, newType);
     }
     setDraggedId(null);
     setDragOverId(null);
+    setDragOverGroupId(null);
   };
 
   return (
@@ -265,14 +283,23 @@ export function PrayerRequestInput() {
       </form>
 
       {/* Prayer List by Type - Draggable Tiles */}
-      <div className="flex-1 overflow-y-auto space-y-4">
+      <div className="flex-1 overflow-y-auto space-y-4 px-2 sm:px-3">
         {groupedPrayers.length === 0 ? (
           <p className="text-muted-foreground text-sm italic">
             No prayer requests yet. Add one above.
           </p>
         ) : (
           groupedPrayers.map(group => (
-            <div key={group.id} className="space-y-2">
+            <div
+              key={group.id}
+              className={cn(
+                'space-y-2 rounded-lg p-3 -m-3 transition-colors',
+                dragOverGroupId === group.id && 'bg-primary/10'
+              )}
+              onDragOver={(e) => handleDragOverCategory(e, group.id)}
+              onDragLeave={handleDragLeaveCategory}
+              onDrop={(e) => handleDropOnCategory(e, group.id)}
+            >
               {/* Category Header - Drop Zone */}
               <div
                 onDragOver={(e) => {
@@ -297,7 +324,7 @@ export function PrayerRequestInput() {
               </div>
 
               {/* Prayer Tiles */}
-              <div className="space-y-2 pl-2">
+              <div className="space-y-2">
                 {group.prayers.map(prayer => (
                   <PrayerTile
                     key={prayer.id}
@@ -349,7 +376,7 @@ export function PrayerRequestInput() {
       </div>
 
       <p className="mt-2 text-sm text-muted-foreground">
-        Drag tiles to reorder. Click "Categories" to add/remove types.
+        Drag tiles to reorder or drop on a category to reassign. Click "Categories" to add/remove types.
       </p>
     </div>
   );

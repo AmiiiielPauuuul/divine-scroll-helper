@@ -27,7 +27,7 @@ const Index = () => {
           </p>
 
           {/* Action Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-lg mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
             {/* Controller Card */}
             <Link
               to="/controller"
@@ -47,6 +47,32 @@ const Index = () => {
               <h2 className="text-lg font-semibold text-foreground mb-1">Controller</h2>
               <p className="text-sm text-muted-foreground mb-4 text-center">
                 Manage content from PC
+              </p>
+              <div className="flex items-center text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                <span>Open</span>
+                <ChevronRight size={16} className="ml-1" />
+              </div>
+            </Link>
+
+            {/* Request Card */}
+            <Link
+              to="/request"
+              className={cn(
+                'group flex flex-col items-center p-8 rounded-2xl transition-all duration-300',
+                'bg-card border border-border hover:border-primary/50',
+                'hover:shadow-lg hover:shadow-primary/10',
+                'focus:outline-none focus:ring-2 focus:ring-primary/50'
+              )}
+            >
+              <div className={cn(
+                'flex items-center justify-center w-16 h-16 rounded-xl mb-4 transition-all duration-300',
+                'bg-secondary group-hover:bg-primary/20'
+              )}>
+                <Heart className="text-foreground group-hover:text-primary transition-colors" size={28} />
+              </div>
+              <h2 className="text-lg font-semibold text-foreground mb-1">Request</h2>
+              <p className="text-sm text-muted-foreground mb-4 text-center">
+                Submit a prayer request
               </p>
               <div className="flex items-center text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">
                 <span>Open</span>
@@ -91,7 +117,7 @@ const Index = () => {
               </li>
               <li className="flex items-start gap-2">
                 <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/20 text-primary text-xs font-medium shrink-0">2</span>
-                <span>Open <strong className="text-foreground">Display</strong> on the pastor's iPad</span>
+                <span>Open <strong className="text-foreground">Display</strong></span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/20 text-primary text-xs font-medium shrink-0">3</span>
@@ -100,6 +126,10 @@ const Index = () => {
               <li className="flex items-start gap-2">
                 <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/20 text-primary text-xs font-medium shrink-0">4</span>
                 <span>Use tabs to switch between Prayer Requests, Birthdays, and more</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/20 text-primary text-xs font-medium shrink-0">5</span>
+                <span>Share <strong className="text-foreground">Request</strong> with members to submit prayer requests</span>
               </li>
             </ol>
           </div>

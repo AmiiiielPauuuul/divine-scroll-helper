@@ -51,9 +51,9 @@ function ControllerContent() {
 
       {/* Main Content */}
       <main className="flex-1 container max-w-7xl mx-auto px-4 py-4 sm:py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 h-auto lg:h-[calc(100vh-12rem)]">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 h-auto lg:h-[calc(100vh-12rem)]">
           {/* Left Panel - Editor */}
-          <div className="flex flex-col bg-card rounded-xl border border-border overflow-hidden min-h-[70vh] lg:min-h-0">
+          <div className="flex flex-col bg-card rounded-xl border border-border overflow-hidden min-h-[70vh] lg:min-h-0 lg:col-span-3">
             {/* Tab Selector for Editing */}
             <div className="p-4 border-b border-border bg-card/50">
               <p className="text-xs text-muted-foreground mb-2">Edit content for:</p>
@@ -85,7 +85,7 @@ function ControllerContent() {
           </div>
 
           {/* Right Panel - Preview & Display Control */}
-          <div className="flex flex-col bg-card rounded-xl border border-border overflow-hidden min-h-[60vh] lg:min-h-0">
+          <div className="flex flex-col bg-card rounded-xl border border-border overflow-hidden min-h-[60vh] lg:min-h-0 lg:col-span-1">
             {/* Display Tab Selector */}
             <div className="p-4 border-b border-border bg-card/50">
               <DisplayTabSelector />
