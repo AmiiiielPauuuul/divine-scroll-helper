@@ -1,0 +1,11 @@
+{
+  "name": "teleprompter-sync-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node sync-server.mjs"
+  },
+  "dependencies": {
+    "ws": "^8.18.1"
+  }
+}

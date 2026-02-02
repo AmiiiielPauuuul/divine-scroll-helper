@@ -31,6 +31,10 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
   const wsAttemptsRef = useRef(0);
   const stateRef = useRef<TeleprompterState | null>(null);
   const pendingWsSyncRef = useRef(false);
+  const [wsStatus, setWsStatus] = useState<'connected' | 'connecting' | 'disconnected' | 'disabled'>(() => (
+    wsUrlFromEnv ? 'connecting' : 'disabled'
+  ));
+  const [lastSyncAt, setLastSyncAt] = useState<number | null>(null);
   const [state, setState] = useState<TeleprompterState>(() => {
     // Load initial state from localStorage
     if (typeof window !== 'undefined') {
@@ -97,7 +101,10 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
 
   // WebSocket connection for cross-device sync (optional)
   useEffect(() => {
-    if (!wsUrl) return;
+    if (!wsUrl) {
+      setWsStatus('disabled');
+      return;
+    }
 
     let isActive = true;
 
@@ -107,6 +114,7 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
         return;
       }
 
+      setWsStatus('connecting');
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
@@ -147,6 +155,7 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
 
       ws.addEventListener('open', () => {
         wsAttemptsRef.current = 0;
+        setWsStatus('connected');
         const currentState = stateRef.current;
         if (currentState) {
           ws.send(JSON.stringify({
@@ -154,14 +163,19 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
             origin: clientIdRef.current,
             state: currentState,
           }));
+          setLastSyncAt(Date.now());
           pendingWsSyncRef.current = false;
         }
       });
 
       ws.addEventListener('message', handleMessage);
+      ws.addEventListener('message', () => setLastSyncAt(Date.now()));
 
       ws.addEventListener('error', scheduleReconnect);
-      ws.addEventListener('close', scheduleReconnect);
+      ws.addEventListener('close', () => {
+        setWsStatus('disconnected');
+        scheduleReconnect();
+      });
 
       return () => {
         ws.removeEventListener('message', handleMessage);
@@ -175,6 +189,7 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
 
     return () => {
       isActive = false;
+      setWsStatus('disconnected');
       if (wsRetryRef.current) window.clearTimeout(wsRetryRef.current);
       wsRetryRef.current = null;
       wsAttemptsRef.current = 0;
@@ -201,6 +216,7 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
           origin: clientIdRef.current,
           state,
         }));
+        setLastSyncAt(Date.now());
       }
     } else if (ws) {
       pendingWsSyncRef.current = true;
@@ -371,6 +387,8 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
   }, []);
 
   const value: TeleprompterContextValue = {
+    wsStatus,
+    lastSyncAt,
     ...state,
     setActiveTab,
     setDisplayTab,

@@ -11,7 +11,7 @@ import { Monitor, Tablet, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 function ControllerContent() {
-  const { activeTab, displayTab, tabs } = useTeleprompter();
+  const { activeTab, displayTab, tabs, wsStatus, lastSyncAt } = useTeleprompter();
   const currentTab = tabs.find(t => t.id === activeTab);
   const displayTabData = tabs.find(t => t.id === displayTab);
 
@@ -32,6 +32,21 @@ function ControllerContent() {
             </div>
 
             <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span
+                  className={cn(
+                    'h-2 w-2 rounded-full',
+                    wsStatus === 'connected' && 'bg-green-500',
+                    wsStatus === 'connecting' && 'bg-yellow-500',
+                    wsStatus === 'disconnected' && 'bg-red-500',
+                    wsStatus === 'disabled' && 'bg-muted-foreground'
+                  )}
+                />
+                <span className="capitalize">{wsStatus}</span>
+                {lastSyncAt && (
+                  <span className="hidden sm:inline">• {new Date(lastSyncAt).toLocaleTimeString()}</span>
+                )}
+              </div>
               <Link
                 to="/display"
                 target="_blank"

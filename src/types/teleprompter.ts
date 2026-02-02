@@ -50,6 +50,8 @@ export interface TeleprompterState {
 }
 
 export interface TeleprompterContextValue extends TeleprompterState {
+  wsStatus: 'connected' | 'connecting' | 'disconnected' | 'disabled';
+  lastSyncAt: number | null;
   setActiveTab: (tabId: TabId) => void;
   setDisplayTab: (tabId: TabId) => void;
   updateTabContent: (tabId: TabId, content: string) => void;

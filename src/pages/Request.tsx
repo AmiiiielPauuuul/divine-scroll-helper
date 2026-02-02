@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { HeartHandshake } from 'lucide-react';
 
 function RequestContent() {
-  const { prayerTypes, addPrayerRequest } = useTeleprompter();
+  const { prayerTypes, addPrayerRequest, wsStatus, lastSyncAt } = useTeleprompter();
   const [nameOrRequest, setNameOrRequest] = useState('');
   const [specificPrayer, setSpecificPrayer] = useState('');
   const [selectedType, setSelectedType] = useState(prayerTypes[0]?.id || '');
@@ -25,7 +25,7 @@ function RequestContent() {
     <div className="min-h-screen bg-background flex flex-col dark">
       <main className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-xl bg-card border border-border rounded-2xl p-6 sm:p-8">
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center gap-3 mb-2">
             <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/15">
               <HeartHandshake className="text-primary" size={24} />
             </div>
@@ -33,6 +33,21 @@ function RequestContent() {
               <h1 className="text-2xl font-semibold text-foreground">Submit a Prayer Request</h1>
               <p className="text-sm text-muted-foreground">Your request appears on the controller and display.</p>
             </div>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-6">
+            <span
+              className={cn(
+                'h-2 w-2 rounded-full',
+                wsStatus === 'connected' && 'bg-green-500',
+                wsStatus === 'connecting' && 'bg-yellow-500',
+                wsStatus === 'disconnected' && 'bg-red-500',
+                wsStatus === 'disabled' && 'bg-muted-foreground'
+              )}
+            />
+            <span className="capitalize">{wsStatus}</span>
+            {lastSyncAt && (
+              <span>• {new Date(lastSyncAt).toLocaleTimeString()}</span>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
