@@ -3,6 +3,17 @@ import { useTeleprompter } from '@/contexts/TeleprompterContext';
 import { PrayerType, PrayerRequest, PrayerTypeInfo } from '@/types/teleprompter';
 import { cn } from '@/lib/utils';
 import { Plus, X, GripVertical, Settings, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 // Available colors for prayer types
 const TYPE_COLORS = [
@@ -129,23 +140,40 @@ export function PrayerRequestInput() {
           <h2 className="text-xl font-semibold text-foreground">Prayer Requests</h2>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              if (!prayerRequests.length) return;
-              const confirmed = window.confirm('Clear all prayer requests? This cannot be undone.');
-              if (confirmed) clearPrayerRequests();
-            }}
-            disabled={!prayerRequests.length}
-            className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all',
-              'bg-destructive/10 text-destructive hover:bg-destructive/20',
-              'disabled:opacity-40 disabled:cursor-not-allowed'
-            )}
-          >
-            <Trash2 size={14} />
-            <span>Clear All</span>
-          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button
+                type="button"
+                disabled={!prayerRequests.length}
+                className={cn(
+                  'flex items-center justify-center p-2 rounded-lg text-sm transition-all',
+                  'bg-destructive/10 text-destructive hover:bg-destructive/20',
+                  'disabled:opacity-40 disabled:cursor-not-allowed'
+                )}
+                aria-label="Clear all prayer requests"
+                title="Clear all"
+              >
+                <Trash2 size={14} />
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Clear all prayer requests?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently remove all prayer requests from the controller and display.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={() => clearPrayerRequests()}
+                >
+                  Yes, clear all
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <button
             onClick={() => setShowTypeManager(!showTypeManager)}
             className={cn(

@@ -29,6 +29,8 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
   const skipWsBroadcastRef = useRef(false);
   const wsRetryRef = useRef<number | null>(null);
   const wsAttemptsRef = useRef(0);
+  const stateRef = useRef<TeleprompterState | null>(null);
+  const pendingWsSyncRef = useRef(false);
   const [state, setState] = useState<TeleprompterState>(() => {
     // Load initial state from localStorage
     if (typeof window !== 'undefined') {
@@ -62,6 +64,10 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
       fontSize: 'lg',
     };
   });
+
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   // BroadcastChannel for cross-tab sync
   const [channel] = useState(() => {
@@ -141,6 +147,15 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
 
       ws.addEventListener('open', () => {
         wsAttemptsRef.current = 0;
+        const currentState = stateRef.current;
+        if (currentState) {
+          ws.send(JSON.stringify({
+            type: 'STATE_UPDATE',
+            origin: clientIdRef.current,
+            state: currentState,
+          }));
+          pendingWsSyncRef.current = false;
+        }
       });
 
       ws.addEventListener('message', handleMessage);
@@ -187,6 +202,8 @@ export function TeleprompterProvider({ children }: TeleprompterProviderProps) {
           state,
         }));
       }
+    } else if (ws) {
+      pendingWsSyncRef.current = true;
     } else if (skipWsBroadcastRef.current) {
       skipWsBroadcastRef.current = false;
     }
